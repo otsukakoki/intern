@@ -8,11 +8,14 @@
 
 <body>
   <h1>しりとり</h1>
+  <p id="historyWord"></p>
   <p id="previousWord"></p>
   <input id="nextWordInput" type="text" />
   <button id="nextWordSendButton">送信</button>
 
   <script type="module">
+    let history=[];
+
     window.onload = async (event) => {
       await fetch("/shiritori", {
         method: "POST",
@@ -25,8 +28,11 @@
 
       const para = document.querySelector("#previousWord");
       para.innerText = `前の単語：${previousWord}`;
+      const his=document.querySelector("#historyWord");
+      his.innerText=`既出単語：${history}`;
+      history.push(previousWord);
     };
-
+    
     document.querySelector("#nextWordSendButton").onclick = async (event) => {
       const nextWord = document.querySelector("#nextWordInput").value;
       const response = await fetch("/shiritori", {
@@ -39,9 +45,17 @@
         return;
       }
       const previousWord = await response.text();
-
+      for(let i=0;i<history.length;i++){
+        if(history[i]==previousWord){
+          his.innerText=`あほ`;
+          return;
+        }
+      }
       const para = document.querySelector("#previousWord");
       para.innerText = `前の単語：${previousWord}`;
+      const his=document.querySelector("#historyWord");
+      his.innerText=`既出単語：${history}`;
+      history.push(previousWord);
     };
   </script>
 </body>
